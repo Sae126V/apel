@@ -177,6 +177,7 @@ def runprocess(db_config_file, config_file):
 
 if __name__ == '__main__':
     # Main method for running the summariser.
+    # Main method for running the summariser.
 
     ver = "APEL summariser %s.%s.%s" % __version__
     default_db_conf_file = '/etc/apel/db.cfg'
