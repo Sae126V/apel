@@ -158,6 +158,11 @@ if __name__ == '__main__':
     except ConfigParser.NoOptionError:
         withhold_dns = False
 
+    try:
+        include_infrastructure_description = cp.getboolean('unloader', 'include_infrastructure_description')
+    except ConfigParser.NoOptionError:
+        include_infrastructure_description = False
+
     include_vos      = None
     exclude_vos      = None
     try:
@@ -176,6 +181,7 @@ if __name__ == '__main__':
     unloader = DbUnloader(db, unload_dir, include_vos, exclude_vos, local_jobs, withhold_dns, dict_records)
 
     unloader.records_per_message = _bounded_records_per_message(cp, log)
+    unloader.include_infrastructure_description = include_infrastructure_description
 
     try:
         if interval == 'latest':

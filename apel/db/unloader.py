@@ -89,6 +89,7 @@ class DbUnloader(object):
         self._local = local
         self._withhold_dns = withhold_dns
         self.records_per_message = 1000
+        self.include_infrastructure_description = False
         if dict_records:
             # If dict_records is True, then we only handle the subset of v0.4 records
             self.RECORD_TYPES = self.DICT_RECORD_TYPES
@@ -292,9 +293,16 @@ class DbUnloader(object):
         '''
         record_type = type(records[0])
 
+        # Build the set of fields to exclude based on configuration.
+        exclude_fields = set()
+        if not self.include_infrastructure_description:
+            exclude_fields.add('InfrastructureDescription')
+
         buf = StringIO.StringIO()
         buf.write(self.APEL_HEADERS[record_type] + '\n')
-        buf.write('%%\n'.join( [ record.get_msg(self._withhold_dns) for record in records ] ))
+        buf.write('%%\n'.join( [ record.get_msg(self._withhold_dns,
+                                                exclude_fields=exclude_fields)
+                                 for record in records ] ))
         buf.write('%%\n')
 
         self._msgq.add(buf.getvalue())
