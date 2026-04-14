@@ -1,7 +1,35 @@
 -- This schema adds the tables necessary for Accelerator accounting as a
 -- separate record as part of the wider Cloud Accounting system.
 
+
+-- -----------------------------------------------------------------------------
+-- Sites
+DROP TABLE IF EXISTS Sites;
+CREATE TABLE Sites (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+ ,  name VARCHAR(255) NOT NULL
+
+ , INDEX(name)
+
+) ;
+
+DROP FUNCTION IF EXISTS SiteLookup;
+DELIMITER //
+CREATE FUNCTION SiteLookup(lookup VARCHAR(255)) RETURNS INTEGER DETERMINISTIC
+BEGIN
+    DECLARE result INTEGER;
+    SELECT id FROM Sites WHERE name=lookup INTO result;
+    IF result IS NULL THEN
+        INSERT INTO Sites(name) VALUES (lookup);
+        SET result=LAST_INSERT_ID();
+    END IF;
+RETURN result;
+END //
+DELIMITER ;
+
+
 -- ------------------------------------------------------------------------------
+-- SiteNameLookup (reverse lookup: id -> name)
 DROP FUNCTION IF EXISTS SiteNameLookup;
 DELIMITER //
 CREATE FUNCTION SiteNameLookup(lookup INTEGER) RETURNS VARCHAR(255) DETERMINISTIC
@@ -11,6 +39,33 @@ BEGIN
   RETURN result;
 END //
 DELIMITER ;
+
+
+-- -----------------------------------------------------------------------------
+-- DNs
+DROP TABLE IF EXISTS DNs;
+CREATE TABLE DNs (
+    id INT NOT NULL AUTO_INCREMENT PRIMARY KEY
+ ,  name VARCHAR(255) NOT NULL
+
+ ,  INDEX(name)
+
+) ;
+
+DROP FUNCTION IF EXISTS DNLookup;
+DELIMITER //
+CREATE FUNCTION DNLookup(lookup VARCHAR(255)) RETURNS INTEGER DETERMINISTIC
+BEGIN
+    DECLARE result INTEGER;
+    SELECT id FROM DNs WHERE name=lookup INTO result;
+    IF result IS NULL THEN
+        INSERT INTO DNs(name) VALUES (lookup);
+        SET result=LAST_INSERT_ID();
+    END IF;
+RETURN result;
+END //
+DELIMITER ;
+
 
 DROP TABLE IF EXISTS AcceleratorRecords;
 CREATE TABLE AcceleratorRecords (
